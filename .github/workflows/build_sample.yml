@@ -65,21 +65,20 @@ jobs:
           
           mkdir -p Kernel && mkdir -p Gcc && mkdir -p Clang
           git clone --recursive https://github.com/HenryLogic/kernel_xiaomi_sm8250.git -b aosp-16 Kernel/android_kernel
-          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.7/LLVM-21.1.7-Linux-X64.tar.xz
-          mkdir Clang/clang-llvm && tar -C Clang/clang-llvm/ -xvf LLVM-21.1.7-Linux-X64.tar.xz
+          wget https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.0/LLVM-19.1.0-Linux-X64.tar.xz
+          tar -C Clang/ -xvf LLVM-19.1.0-Linux-X64.tar.xz
           git clone --recursive https://github.com/JackA1ltman/Google-GCC-Android-4.9.git -b aarch64 Gcc/gcc-64
           git clone --recursive https://github.com/JackA1ltman/Google-GCC-Android-4.9.git -b arm32 Gcc/gcc-32
           
-          export PATH=~/Clang/clang-llvm/LLVM-21.1.7-Linux-X64/bin:$PATH
+      - name: Build Process
+        run: |
+          export PATH=~/Clang/LLVM-19.1.0-Linux-X64/bin:$PATH
           export O=out
           export ARCH=arm64
           export SUBARCH=arm64
           export CROSS_COMPILE=~/Gcc/gcc-64/bin/aarch64-linux-android-
           export CROSS_COMPILE_ARM32=~/Gcc/gcc-32/bin/arm-linux-androideabi-
           export CLANG_TRIPLE=aarch64-linux-gnu-
-      
-      - name: Build Process
-        run: |
           cd Kernel/android_kernel
           make CC="ccache clang" NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip lmi_defconfig
           make -j$(nproc --all) CC="ccache clang" NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip
